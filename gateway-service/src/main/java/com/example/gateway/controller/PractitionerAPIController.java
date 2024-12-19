@@ -1,25 +1,21 @@
 package com.example.gateway.controller;
 
+import com.example.gateway.model.Practitioner;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.client.loadbalancer.LoadBalanced;
-import org.springframework.context.annotation.Bean;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
-
-import com.example.gateway.model.Practitioner;
-import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
-import org.springframework.http.HttpMethod;
-import org.springframework.retry.annotation.Retryable;
-import org.springframework.retry.annotation.Backoff;
 
 @RestController
 @RequestMapping("/api/practitioner")
@@ -28,13 +24,21 @@ public class PractitionerAPIController {
     @Autowired
     RestTemplate restTemplate;
 
+    @Value("${practitioner.api.path}")
+    private String PRACTITIONER_API_PATH;
+
     @HystrixCommand(fallbackMethod = "defaultPractitioners")
     @GetMapping("/")
     @Retryable(value = { Exception.class }, maxAttempts = 3, backoff = @Backoff(delay = 1000))
     public List<Practitioner> getPractitioners() {
-        return restTemplate.exchange("http://practitioner-api/practitioner", HttpMethod.GET, null,
-                new ParameterizedTypeReference<List<Practitioner>>() {
-                }).getBody();
+        return restTemplate
+                .exchange(
+                        PRACTITIONER_API_PATH,
+                        HttpMethod.GET,
+                        null,
+                        new ParameterizedTypeReference<List<Practitioner>>() {
+                        })
+                .getBody();
     }
 
     public String defaultPractitioners() {
@@ -45,7 +49,9 @@ public class PractitionerAPIController {
     @GetMapping("/{id}")
     @Retryable(value = { Exception.class }, maxAttempts = 3, backoff = @Backoff(delay = 1000))
     public Practitioner getPractitioner(long id) {
-        return restTemplate.getForObject("http://practitioner-api/practitioner/" + id, Practitioner.class);
+        return restTemplate.getForObject(
+                PRACTITIONER_API_PATH + id,
+                Practitioner.class);
     }
 
     public String defaultPractitioner(long id) {
@@ -53,10 +59,13 @@ public class PractitionerAPIController {
     }
 
     @HystrixCommand(fallbackMethod = "defaultPractitioner")
-    @PostMapping("/add")
+    @PostMapping("/")
     @Retryable(value = { Exception.class }, maxAttempts = 3, backoff = @Backoff(delay = 1000))
     public Practitioner addPractitioner(Practitioner practitioner) {
-        return restTemplate.postForObject("http://practitioner-api/practitioner/add", practitioner, Practitioner.class);
+        return restTemplate.postForObject(
+                PRACTITIONER_API_PATH,
+                practitioner,
+                Practitioner.class);
     }
 
     public String defaultPractitioner(Practitioner practitioner) {
@@ -64,10 +73,12 @@ public class PractitionerAPIController {
     }
 
     @HystrixCommand(fallbackMethod = "defaultPractitioner")
-    @PutMapping("/update/{id}")
+    @PutMapping("/{id}")
     @Retryable(value = { Exception.class }, maxAttempts = 3, backoff = @Backoff(delay = 1000))
     public Practitioner updatePractitioner(long id, Practitioner practitioner) {
-        return restTemplate.postForObject("http://practitioner-api/practitioner/update/" + id, practitioner,
+        return restTemplate.postForObject(
+                PRACTITIONER_API_PATH + id,
+                practitioner,
                 Practitioner.class);
     }
 
@@ -76,33 +87,61 @@ public class PractitionerAPIController {
     }
 
     @HystrixCommand(fallbackMethod = "defaultPractitioner")
-    @GetMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     @Retryable(value = { Exception.class }, maxAttempts = 3, backoff = @Backoff(delay = 1000))
     public void deletePractitioner(long id) {
-        restTemplate.delete("http://practitioner-api/practitioner/delete/" + id);
+        restTemplate.delete(
+                PRACTITIONER_API_PATH + id);
     }
 
     @HystrixCommand(fallbackMethod = "defaultPractitioner")
-    @PostMapping("/addConsultation")
+    @PostMapping("/consultation")
     @Retryable(value = { Exception.class }, maxAttempts = 3, backoff = @Backoff(delay = 1000))
     public void addConsultation(long id, long idPatientS, String date) {
-        restTemplate.postForObject("http://practitioner-api/practitioner/addConsultation/" + id + "/" + idPatientS + "/"
-                + date, null, Practitioner.class);
+        restTemplate.postForObject(
+                PRACTITIONER_API_PATH +
+                        "consultation/" +
+                        id +
+                        "/" +
+                        idPatientS +
+                        "/" +
+                        date,
+                null,
+                Practitioner.class);
     }
 
     @HystrixCommand(fallbackMethod = "defaultPractitioner")
-    @DeleteMapping("/deleteConsultation")
+    @DeleteMapping("/consultation")
     @Retryable(value = { Exception.class }, maxAttempts = 3, backoff = @Backoff(delay = 1000))
     public void deleteConsultation(long id, long idPatientS, String date) {
-        restTemplate.delete("http://practitioner-api/practitioner/deleteConsultation/" + id + "/" + idPatientS + "/"
-                + date);
+        restTemplate.delete(
+                PRACTITIONER_API_PATH +
+                        "consultation/" +
+                        id +
+                        "/" +
+                        idPatientS +
+                        "/" +
+                        date);
     }
 
-    // TODO : finir les methodes et modif dans les originaux
-
-    @Bean
-    @LoadBalanced
-    public RestTemplate restTemplate() {
-        return new RestTemplate();
+    @HystrixCommand(fallbackMethod = "defaultPractitioner")
+    @GetMapping("/consultation")
+    @Retryable(value = { Exception.class }, maxAttempts = 3, backoff = @Backoff(delay = 1000))
+    public List<String> getConsultation(long id, long idPatientS, String date) {
+        return restTemplate
+                .exchange(
+                        PRACTITIONER_API_PATH +
+                                "consultation/" +
+                                id +
+                                "/" +
+                                idPatientS +
+                                "/" +
+                                date,
+                        HttpMethod.GET,
+                        null,
+                        new ParameterizedTypeReference<List<String>>() {
+                        })
+                .getBody();
     }
+
 }

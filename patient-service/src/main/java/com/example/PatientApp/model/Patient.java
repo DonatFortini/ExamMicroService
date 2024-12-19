@@ -1,9 +1,6 @@
 package com.example.PatientApp.model;
 
 import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -23,8 +20,6 @@ public class Patient {
         this.address = address;
     }
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @ApiModelProperty(notes = "ID du patient")
     private Long id;
 
@@ -40,7 +35,6 @@ public class Patient {
     @ApiModelProperty(notes = "Adresse du patient")
     private String address;
 
-    // Getters and setters
     public Long getId() {
         return id;
     }

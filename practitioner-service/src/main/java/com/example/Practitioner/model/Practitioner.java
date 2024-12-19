@@ -8,8 +8,11 @@ import javax.persistence.*;
 @Entity
 @ApiModel(description = "Details about the Practitioner")
 public class Practitioner {
+    @ApiModelProperty(notes = "The database generated practitioner ID")
     private long id;
+    @ApiModelProperty(notes = "The practitioner name")
     private String name;
+    @ApiModelProperty(notes = "The practitioner speciality")
     private String speciality;
 
     public Practitioner() {
@@ -21,9 +24,6 @@ public class Practitioner {
         this.speciality = speciality;
     }
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @ApiModelProperty(notes = "The database generated Practitioner ID")
     public long getId() {
         return id;
     }
@@ -32,8 +32,6 @@ public class Practitioner {
         this.id = id;
     }
 
-    @Column(name = "name", nullable = false)
-    @ApiModelProperty(notes = "The name of the Practitioner")
     public String getName() {
         return name;
     }
@@ -42,8 +40,6 @@ public class Practitioner {
         this.name = name;
     }
 
-    @Column(name = "speciality", nullable = false)
-    @ApiModelProperty(notes = "The speciality of the Practitioner")
     public String getSpeciality() {
         return speciality;
     }

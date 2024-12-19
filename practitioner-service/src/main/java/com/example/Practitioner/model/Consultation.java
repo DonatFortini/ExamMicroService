@@ -1,4 +1,4 @@
-package com.example.appointment.model;
+package com.example.Practitioner.model;
 
 import javax.persistence.Entity;
 

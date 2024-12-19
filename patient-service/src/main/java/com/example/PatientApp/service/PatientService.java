@@ -3,12 +3,30 @@ package com.example.PatientApp.service;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
+import com.example.PatientApp.model.MedicalRecords;
 import com.example.PatientApp.model.Patient;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
+import org.springframework.http.HttpMethod;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.retry.annotation.Backoff;
+
 import javax.annotation.PostConstruct;
 
 @Service
 public class PatientService {
+
+    @Lazy
+    @Autowired
+    RestTemplate restTemplate;
+
     private List<Patient> patients = new ArrayList<>();
 
     @PostConstruct
@@ -42,5 +60,25 @@ public class PatientService {
             p.setPhone(patient.getPhone());
             p.setAddress(patient.getAddress());
         });
+    }
+
+    @HystrixCommand(fallbackMethod = "getMedicalRecordsFallback")
+    @Retryable(value = Exception.class, maxAttempts = 3, backoff = @Backoff(delay = 1000))
+    public List<MedicalRecords> getMedicalRecords(long patientId) {
+        return restTemplate.exchange(
+                "http://localhost:8181/medicalRecords/patient/" + patientId,
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<List<MedicalRecords>>() {
+                }).getBody();
+    }
+
+    public String getMedicalRecordsFallback(long patientId) {
+        return "Aucun dossier médical trouvé pour le patient " + patientId;
+    }
+
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
     }
 }

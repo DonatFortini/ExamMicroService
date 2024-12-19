@@ -1,4 +1,4 @@
-package com.example.medicalRec.model;
+package com.example.PatientApp.model;
 
 import java.util.List;
 

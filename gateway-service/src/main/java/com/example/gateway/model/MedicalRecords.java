@@ -1,20 +1,13 @@
-package com.example.medicalRec.model;
+package com.example.gateway.model;
 
 import java.util.List;
 
 import javax.persistence.Entity;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
-
 @Entity
-@ApiModel(description = "Details about the Medical Records")
 public class MedicalRecords {
-    @ApiModelProperty(notes = "The patient ID")
     private long patientId;
-    @ApiModelProperty(notes = "The practitioner ID")
     private long practitionerId;
-    @ApiModelProperty(notes = "List of exchange between patient and practitioner")
     private List<String> medicalRecords;
 
     public MedicalRecords() {

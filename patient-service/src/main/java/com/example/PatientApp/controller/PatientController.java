@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.PatientApp.model.MedicalRecords;
 import com.example.PatientApp.model.Patient;
 import com.example.PatientApp.service.PatientService;
 
@@ -53,6 +54,12 @@ public class PatientController {
     @PutMapping("/{id}")
     public void modifyPatient(@PathVariable Long id, Patient patient) {
         patientService.modifyPatient(id, patient);
+    }
+
+    @ApiOperation(value = "Retourne les dossiers médicaux d'un patient")
+    @GetMapping("/{id}/medicalRecords")
+    public List<MedicalRecords> getMedicalRecords(@PathVariable Long id) {
+        return patientService.getMedicalRecords(id);
     }
 
 }

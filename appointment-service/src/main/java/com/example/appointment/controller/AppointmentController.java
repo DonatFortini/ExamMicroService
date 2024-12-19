@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.appointment.service.AppointmentService;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import com.example.appointment.model.*;
@@ -19,54 +20,52 @@ public class AppointmentController {
     @Autowired
     private AppointmentService appointmentService;
 
-    @GetMapping("/patient/{id}")
-    public Patient getPatient(@PathVariable long id) {
-        return appointmentService.getPatient(id);
-    }
-
-    @GetMapping("/practitioner/{id}")
-    public Practitioner getPractitioner(@PathVariable long id) {
-        return appointmentService.getPractitioner(id);
-    }
-
-    @GetMapping("/consultations")
+    @ApiOperation(value = "Get all consultations")
+    @GetMapping("/")
     public List<Consultation> getConsultations() {
         return appointmentService.getConsultations();
     }
 
-    @DeleteMapping("/consultation/{id}")
+    @ApiOperation(value = "Delete consultation by ID")
+    @DeleteMapping("/{id}")
     public void deleteConsultation(@PathVariable long id) {
         appointmentService.deleteConsultation(id);
     }
 
-    @PostMapping("/consultation")
+    @ApiOperation(value = "Add a new consultation")
+    @PostMapping("/")
     public void addConsultation(@RequestBody Consultation consultation) {
         appointmentService.addConsultation(consultation);
     }
 
-    @PutMapping("/consultation")
+    @ApiOperation(value = "Update an existing consultation")
+    @PutMapping("/")
     public void updateConsultation(@RequestBody Consultation consultation) {
         appointmentService.updateConsultation(consultation);
     }
 
-    @GetMapping("/consultation/{id}")
+    @ApiOperation(value = "Get consultation by ID")
+    @GetMapping("/{id}")
     public Consultation getConsultation(@PathVariable long id) {
         return appointmentService.getConsultation(id);
     }
 
-    @PostMapping("/createConsultation")
+    @ApiOperation(value = "Create a new consultation")
+    @PostMapping("/create")
     public void createConsultation(@RequestParam long patientId, @RequestParam long practitionerId,
             @RequestParam String date) {
         appointmentService.createConsultation(patientId, practitionerId, date);
     }
 
-    @GetMapping("/consultations/practitioner/{practitionerId}")
-    public List<String> consultForPractitionerId(@PathVariable long practitionerId) {
+    @ApiOperation(value = "Get consultations for a specific practitioner ID")
+    @GetMapping("/practitioner/{practitionerId}")
+    public List<Consultation> consultForPractitionerId(@PathVariable long practitionerId) {
         return appointmentService.consultForPractitionerId(practitionerId);
     }
 
-    @GetMapping("/consultations/patient/{patientId}")
-    public List<String> consultForPatientId(@PathVariable long patientId) {
+    @ApiOperation(value = "Get consultations for a specific patient ID")
+    @GetMapping("/patient/{patientId}")
+    public List<Consultation> consultForPatientId(@PathVariable long patientId) {
         return appointmentService.consultForPatientId(patientId);
     }
 

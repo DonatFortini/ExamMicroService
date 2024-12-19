@@ -98,7 +98,7 @@ public class AppointmentService {
     }
 
     @HystrixCommand(fallbackMethod = "fallbackCreateConsultation")
-    @Retryable(value = { Exception.class }, maxAttempts = 3, backoff = @Backoff(delay = 2000))
+    @Retryable(value = { Exception.class }, maxAttempts = 1, backoff = @Backoff(delay = 2000))
     public void createConsultation(long patientId, long practitionerId, String date) {
         Patient patient = getPatient(patientId);
         Practitioner practitioner = getPractitioner(practitionerId);
@@ -129,20 +129,20 @@ public class AppointmentService {
         }
     }
 
-    public void fallbackCreateConsultation(long patientId, long practitionerId, String date) {
-        System.out.println("Failed to create consultation. Please try again later.");
+    public String fallbackCreateConsultation(long patientId, long practitionerId, String date) {
+        return "Failed to create consultation. Please try again later.";
     }
 
-    public List<String> consultForPractitionerId(long practitionerId) {
-        return consultations.stream().filter(c -> c.getPractitionerId() == practitionerId)
-                .map(Consultation::toString)
-                .collect(Collectors.toList());
+    public List<Consultation> consultForPractitionerId(long practitionerId) {
+        return consultations.stream().filter(c -> c.getPractitionerId() == practitionerId).collect(Collectors.toList());
     }
 
-    public List<String> consultForPatientId(long patientId) {
-        return consultations.stream().filter(c -> c.getPatientId() == patientId)
-                .map(Consultation::toString)
-                .collect(Collectors.toList());
+    public List<Consultation> consultForPatientId(long patientId) {
+        return consultations.stream().filter(c -> c.getPatientId() == patientId).collect(Collectors.toList());
+    }
+
+    public List<Consultation> consultForDate(String date) {
+        return consultations.stream().filter(c -> c.getDate().equals(date)).collect(Collectors.toList());
     }
 
     @Bean
