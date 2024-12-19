@@ -1,0 +1,76 @@
+version: "3"
+services:
+  eureka-server:
+    build:
+      context: .
+      dockerfile: Dockerfile-eureka-server
+    ports:
+      - "8100:8100"
+    networks:
+      - microservices-network
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+
+  api-gateway:
+    build:
+      context: .
+      dockerfile: Dockerfile-api-gateway
+    ports:
+      - "8010:8010"
+    networks:
+      - microservices-network
+    environment:
+      - EUREKA_SERVER=http://eureka-server:8100/eureka/
+      - SPRING_PROFILES_ACTIVE=docker
+
+  patient-service:
+    build:
+      context: .
+      dockerfile: Dockerfile-patient-service
+    ports:
+      - "8085:8085"
+    networks:
+      - microservices-network
+    environment:
+      - EUREKA_SERVER=http://eureka-server:8100/eureka/
+      - SPRING_PROFILES_ACTIVE=docker
+
+  appointment-service:
+    build:
+      context: .
+      dockerfile: Dockerfile-appointment-service
+    ports:
+      - "8095:8095"
+    networks:
+      - microservices-network
+    environment:
+      - EUREKA_SERVER=http://eureka-server:8100/eureka/
+      - SPRING_PROFILES_ACTIVE=docker
+
+  practitioner-service:
+    build:
+      context: .
+      dockerfile: Dockerfile-practitioner-service
+    ports:
+      - "8090:8090"
+    networks:
+      - microservices-network
+    environment:
+      - EUREKA_SERVER=http://eureka-server:8100/eureka/
+      - SPRING_PROFILES_ACTIVE=docker
+
+  medical-record-service:
+    build:
+      context: .
+      dockerfile: Dockerfile-medical-record-service
+    ports:
+      - "8181:8181"
+    networks:
+      - microservices-network
+    environment:
+      - EUREKA_SERVER=http://eureka-server:8100/eureka/
+      - SPRING_PROFILES_ACTIVE=docker
+
+networks:
+  microservices-network:
+    driver: bridge

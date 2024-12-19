@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: medical-record-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: medical-record-service
+  template:
+    metadata:
+      labels:
+        app: medical-record-service
+    spec:
+      containers:
+        - name: medical-record-service
+          image: medical-record-service:latest
+          ports:
+            - containerPort: 8181
+          resources:
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+          environment:
+            - name: EUREKA_SERVER
+              value: http://eureka-server:8100/eureka/
+            - name: SPRING_PROFILES_ACTIVE
+              value: docker
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: medical-record-service-service
+spec:
+  selector:
+    app: medical-record-service
+  ports:
+    - protocol: TCP
+      port: 8181
+      targetPort: 8181
+  type: ClusterIP
