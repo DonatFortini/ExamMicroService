@@ -9,17 +9,17 @@ import io.swagger.annotations.ApiModelProperty;
 @ApiModel(description = "RDV entre un patient et un médecin")
 public class Consultation {
     private long id;
-    private Patient patient;
-    private Practitioner practitioner;
+    private long patientId;
+    private long practitionerId;
     private String date;
 
     public Consultation() {
     }
 
-    public Consultation(long id, Patient patient, Practitioner practitioner, String date) {
+    public Consultation(long id, long patientId, long practitionerId, String date) {
         this.id = id;
-        this.patient = patient;
-        this.practitioner = practitioner;
+        this.patientId = patientId;
+        this.practitionerId = practitionerId;
         this.date = date;
     }
 
@@ -33,21 +33,21 @@ public class Consultation {
     }
 
     @ApiModelProperty(notes = "Patient de la consultation")
-    public Patient getPatient() {
-        return patient;
+    public long getPatientId() {
+        return patientId;
     }
 
-    public void setPatient(Patient patient) {
-        this.patient = patient;
+    public void setPatientId(long patientId) {
+        this.patientId = patientId;
     }
 
     @ApiModelProperty(notes = "Médecin de la consultation")
-    public Practitioner getPractitioner() {
-        return practitioner;
+    public long getPractitionerId() {
+        return practitionerId;
     }
 
-    public void setPractitioner(Practitioner practitioner) {
-        this.practitioner = practitioner;
+    public void setPractitionerId(long practitionerId) {
+        this.practitionerId = practitionerId;
     }
 
     @ApiModelProperty(notes = "Date de la consultation")
@@ -61,8 +61,8 @@ public class Consultation {
 
     @Override
     public String toString() {
-        return "Consultation entre le patient " + patient.getName() + " et le médecin " + practitioner.getName()
-                + " le " + date;
+        return "Consultation [id=" + id + ", patientId=" + patientId + ", practitionerId=" + practitionerId + ", date="
+                + date + "]";
     }
 
 }

@@ -2,6 +2,9 @@ package com.example.appointment.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,12 +28,12 @@ import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 
 @Service
-public class AppointementService {
+public class AppointmentService {
 
-    @Value("${patient.service.url}")
+    @Value("${patients.api.url}")
     private String PATIENT_SERVICE_URL;
 
-    @Value("${practitioner.service.url}")
+    @Value("${practitioners.api.url}")
     private String PRACTITIONER_SERVICE_URL;
 
     @Value("${google.calendar.api.url}")
@@ -44,6 +47,14 @@ public class AppointementService {
     @Lazy
     @Autowired
     RestTemplate restTemplate;
+
+    @PostConstruct
+    void init() {
+        consultations.add(new Consultation(1, 1, 1, "2021-06-01"));
+        consultations.add(new Consultation(2, 2, 2, "2021-06-02"));
+        consultations.add(new Consultation(3, 3, 3, "2021-06-03"));
+        consultations.add(new Consultation(4, 1, 2, "2021-06-04"));
+    }
 
     @HystrixCommand(fallbackMethod = "fallbackGetPatient")
     @Retryable(value = { Exception.class }, maxAttempts = 3, backoff = @Backoff(delay = 2000))
@@ -120,6 +131,15 @@ public class AppointementService {
 
     public void fallbackCreateConsultation(long patientId, long practitionerId, String date) {
         System.out.println("Failed to create consultation. Please try again later.");
+    }
+
+    public List<Consultation> consultForPractitionerId(long practitionerId) {
+        return consultations.stream().filter(c -> c.getPractitionerId() == practitionerId)
+                .collect(Collectors.toList());
+    }
+
+    public List<Consultation> consultForPatientId(long patientId) {
+        return consultations.stream().filter(c -> c.getPatientId() == patientId).collect(Collectors.toList());
     }
 
     @Bean
