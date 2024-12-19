@@ -133,13 +133,16 @@ public class AppointmentService {
         System.out.println("Failed to create consultation. Please try again later.");
     }
 
-    public List<Consultation> consultForPractitionerId(long practitionerId) {
+    public List<String> consultForPractitionerId(long practitionerId) {
         return consultations.stream().filter(c -> c.getPractitionerId() == practitionerId)
+                .map(Consultation::toString)
                 .collect(Collectors.toList());
     }
 
-    public List<Consultation> consultForPatientId(long patientId) {
-        return consultations.stream().filter(c -> c.getPatientId() == patientId).collect(Collectors.toList());
+    public List<String> consultForPatientId(long patientId) {
+        return consultations.stream().filter(c -> c.getPatientId() == patientId)
+                .map(Consultation::toString)
+                .collect(Collectors.toList());
     }
 
     @Bean

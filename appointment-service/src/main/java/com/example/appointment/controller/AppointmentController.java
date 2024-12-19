@@ -60,4 +60,14 @@ public class AppointmentController {
         appointmentService.createConsultation(patientId, practitionerId, date);
     }
 
+    @GetMapping("/consultations/practitioner/{practitionerId}")
+    public List<String> consultForPractitionerId(@PathVariable long practitionerId) {
+        return appointmentService.consultForPractitionerId(practitionerId);
+    }
+
+    @GetMapping("/consultations/patient/{patientId}")
+    public List<String> consultForPatientId(@PathVariable long patientId) {
+        return appointmentService.consultForPatientId(patientId);
+    }
+
 }

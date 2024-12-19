@@ -1,5 +1,10 @@
 package com.example.Practitioner.model;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
+import javax.persistence.*;
+
 @Entity
 @ApiModel(description = "Details about the Practitioner")
 public class Practitioner {
